@@ -5,10 +5,16 @@ let w = 30;
 let updates = 20;
 let pause = true;
 let pauseButton;
+let fpsSliderText;
 
 function setup() {
-  createCanvas(600, 600);
-  frameRate(updates);
+  createCanvas(901, 601);
+
+  fpsSliderText = createP(`Fps Slider: ${updates}`);
+  fpsSliderText.style("font-size", "1.4em");
+  fpsSlider = createSlider(1, 60, 10);
+  pauseButton = createButton("Start");
+  pauseButton.mousePressed(togglePause);
 
   cols = floor(width / w);
   rows = floor(height / w);
@@ -19,21 +25,23 @@ function setup() {
       grid[i][j] = new Cell(i, j, w);
     }
   }
-  fpsSlider = createSlider(1, 100, 20, 2);
-  pauseButton = createButton("Start");
-  pauseButton.mousePressed(togglePause);
-
-  // grid[0][0].isAlive = true;
 }
 
 function draw() {
   background(0);
 
+  updates = fpsSlider.value();
+  pause ? frameRate(60) : frameRate(updates);
+  pause
+    ? (pauseButton.elt.innerText = "Start")
+    : (pauseButton.elt.innerText = "Pause");
+
+  fpsSliderText.elt.innerText = `Fps Slider: ${updates}`;
+
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
       cell = grid[i][j];
       cell.show();
-
       cell.countAliveNeighbors();
     }
   }
@@ -66,8 +74,6 @@ function simulate(i, j) {
 
 function togglePause() {
   pause = !pause;
-  pause ? (pauseButton.label = "Start") : (pauseButton.label = "Pause");
-  console.log(pauseButton.label);
 }
 
 //Overriding p5's mousePressed function to check if a cell has been clicked on
